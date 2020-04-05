@@ -1,11 +1,22 @@
 import CsvReader from "./CsvReader";
 
-const data = new CsvReader("oscar-female-winner.csv").read();
-// 1 counting winner from age 20-30
+const footballGameData = new CsvReader("football.csv").read();
+
+//count how many time man united won
+enum MatchResult {
+  HOME_WIN = "H",
+  AWAY_WIN = "A",
+  DRAW = "D"
+}
+
 let winCount = 0;
-data.forEach((colomn) => {
-  let age = parseInt(colomn[2]);
-  age > 20 && age < 30 && winCount++;
+footballGameData.forEach(([HomeTeam, AwayTeam, _, _, matchResult]) => {
+  if (
+    (HomeTeam === "Man United" && matchResult === MatchResult.HOME_WIN) ||
+    (AwayTeam === "Man United" && matchResult === MatchResult.AWAY_WIN)
+  ) {
+    winCount++;
+  }
 });
 
-console.log(`Total winner age range from 20 - 30 : ${winCount} people`);
+console.log(`Total Manchested Win 20 - 30 : ${winCount} times`);
