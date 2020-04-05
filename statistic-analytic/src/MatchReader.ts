@@ -3,7 +3,6 @@ import { MatchResult } from "./index";
 
 interface DataReader {
   read(): string[][];
-  data: string[][];
 }
 
 type MatchData = [Date, string, string, number, number, MatchResult, string];
