@@ -1,10 +1,18 @@
 import MatchReader from "./MatchReader";
-import { MatchResult } from "./MatchReader";
+import CsvReader from "./CsvReader";
 
-const footballGameData = new MatchReader("football.csv").read();
+export enum MatchResult {
+  HOME_WIN = "H",
+  AWAY_WIN = "A",
+  DRAW = "D"
+}
+
+const csvReader = new CsvReader("football.csv");
+const matchReader = new MatchReader(csvReader);
+matchReader.load();
 
 let winCount = 0;
-footballGameData.forEach(([_, HomeTeam, AwayTeam, _, _, matchResult]) => {
+matchReader.data.forEach(([_, HomeTeam, AwayTeam, _, _, matchResult]) => {
   if (
     (HomeTeam === "Man United" && matchResult === MatchResult.HOME_WIN) ||
     (AwayTeam === "Man United" && matchResult === MatchResult.AWAY_WIN)
