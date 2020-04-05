@@ -1,19 +1,11 @@
-import fs from "fs";
+import CsvReader from "./CsvReader";
 
-const data: string[][] = fs
-  .readFileSync("oscar-female-winner.csv", {
-    encoding: "utf-8"
-  })
-  .split("\n")
-  .map((row: string): string[] => {
-    return row.split(",");
-  });
-
-// 1 Analys : winner from age 20-30
+const data = new CsvReader("oscar-female-winner.csv").read();
+// 1 counting winner from age 20-30
 let winCount = 0;
 data.forEach((colomn) => {
   let age = parseInt(colomn[2]);
   age > 20 && age < 30 && winCount++;
 });
 
-console.log(`Total winner age range from 20-30 : ${winCount} people`);
+console.log(`Total winner age range from 20 - 30 : ${winCount} people`);
