@@ -29,3 +29,33 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+
+
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/web-framework/node_modules
+/web-framework/.pnp
+/web-framework/.pnp.js
+
+# testing
+/web-framework/coverage
+
+# production
+/web-framework/build
+
+# misc
+/web-framework/.DS_Store
+/web-framework/.env.local
+/web-framework/.env.development.local
+/web-framework/.env.test.local
+/web-framework/.env.production.local
+
+
+
+/web-framework/npm-debug.log*
+/web-framework/yarn-debug.log*
+/web-framework/yarn-error.log*
+
