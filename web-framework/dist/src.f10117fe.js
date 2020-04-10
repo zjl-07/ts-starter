@@ -117,7 +117,43 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"node_modules/axios/lib/helpers/bind.js":[function(require,module,exports) {
+})({"src/model/Event.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Event =
+/** @class */
+function () {
+  function Event() {
+    this.events = {};
+  }
+
+  Event.prototype.on = function (eventName, callback) {
+    var handlers = this.events[eventName] || [];
+    handlers.push(callback);
+    this.events[eventName] = handlers;
+  };
+
+  Event.prototype.trigger = function (eventName) {
+    var handlers = this.events[eventName];
+
+    if (!handlers) {
+      return;
+    }
+
+    handlers.forEach(function (callback) {
+      return callback();
+    });
+  };
+
+  return Event;
+}();
+
+exports.default = Event;
+},{}],"node_modules/axios/lib/helpers/bind.js":[function(require,module,exports) {
 'use strict';
 
 module.exports = function bind(fn, thisArg) {
@@ -1900,10 +1936,11 @@ Object.defineProperty(exports, "__esModule", {
 var axios_1 = __importStar(require("axios"));
 
 exports.AxiosResponse = axios_1.AxiosResponse;
+exports.AxiosPromise = axios_1.AxiosPromise;
 exports.default = axios_1.default.create({
   baseURL: "http://localhost:3000"
 });
-},{"axios":"node_modules/axios/index.js"}],"src/model/user.ts":[function(require,module,exports) {
+},{"axios":"node_modules/axios/index.js"}],"src/model/DataSource.ts":[function(require,module,exports) {
 "use strict";
 
 var __importDefault = this && this.__importDefault || function (mod) {
@@ -1918,59 +1955,27 @@ Object.defineProperty(exports, "__esModule", {
 
 var url_1 = __importDefault(require("../config/url"));
 
-var User =
+var DataSource =
 /** @class */
 function () {
-  function User(data) {
-    this.data = data;
-    this.events = {};
+  function DataSource(url) {
+    this.url = url;
   }
 
-  User.prototype.get = function (propName) {
-    return this.data[propName];
+  DataSource.prototype.fetch = function (id) {
+    return url_1.default.get(this.url + "/" + id);
   };
 
-  User.prototype.set = function (newData) {
-    Object.assign(this.data, newData);
+  DataSource.prototype.save = function (data) {
+    var id = data.id;
+    return !id ? url_1.default.post(this.url, data) : url_1.default.put(this.url + "/" + id, data);
   };
 
-  User.prototype.on = function (eventName, callback) {
-    var handlers = this.events[eventName] || [];
-    handlers.push(callback);
-    this.events[eventName] = handlers;
-  };
-
-  User.prototype.trigger = function (eventName) {
-    var handlers = this.events[eventName];
-
-    if (!handlers) {
-      return;
-    }
-
-    handlers.forEach(function (callback) {
-      return callback();
-    });
-  };
-
-  User.prototype.fetch = function () {
-    var _this = this;
-
-    var id = this.get("id");
-    url_1.default.get("user/" + id).then(function (res) {
-      return _this.set(res.data);
-    });
-  };
-
-  User.prototype.save = function () {
-    var id = this.get("id");
-    !id ? url_1.default.post("user", this.data) : url_1.default.put("user/" + id, this.data);
-  };
-
-  return User;
+  return DataSource;
 }();
 
-exports.default = User;
-},{"../config/url":"src/config/url.ts"}],"src/index.ts":[function(require,module,exports) {
+exports.default = DataSource;
+},{"../config/url":"src/config/url.ts"}],"src/model/User.ts":[function(require,module,exports) {
 "use strict";
 
 var __importDefault = this && this.__importDefault || function (mod) {
@@ -1983,14 +1988,51 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var user_1 = __importDefault(require("./model/user"));
+var Event_1 = __importDefault(require("./Event"));
 
-var user = new user_1.default({
+var DataSource_1 = __importDefault(require("./DataSource"));
+
+var User =
+/** @class */
+function () {
+  function User(data) {
+    this.data = data;
+    this.events = new Event_1.default();
+    this.dataSource = new DataSource_1.default("user");
+  }
+
+  User.prototype.get = function (propName) {
+    return this.data[propName];
+  };
+
+  User.prototype.set = function (newData) {
+    Object.assign(this.data, newData);
+  };
+
+  return User;
+}();
+
+exports.default = User;
+},{"./Event":"src/model/Event.ts","./DataSource":"src/model/DataSource.ts"}],"src/index.ts":[function(require,module,exports) {
+"use strict";
+
+var __importDefault = this && this.__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var User_1 = __importDefault(require("./model/User"));
+
+var user = new User_1.default({
   id: "1"
 });
-user.fetch();
 console.log("aa", user);
-},{"./model/user":"src/model/user.ts"}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./model/User":"src/model/User.ts"}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;

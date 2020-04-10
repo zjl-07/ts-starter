@@ -1,4 +1,5 @@
-import httpRequest, { AxiosResponse } from "../config/url";
+import Event from "./Event";
+import DataSource from "./DataSource";
 
 type userProps = {
   id?: string;
@@ -6,12 +7,9 @@ type userProps = {
   age?: number;
 };
 
-type Callback = () => void;
-
 export default class User {
-  events: {
-    [key: string]: Callback[];
-  } = {};
+  public events: Event = new Event();
+  public dataSource: DataSource<userProps> = new DataSource<userProps>("user");
 
   constructor(private data: userProps) {}
 
@@ -21,38 +19,5 @@ export default class User {
 
   set(newData: userProps): void {
     Object.assign(this.data, newData);
-  }
-
-  on(eventName: string, callback: Callback): void {
-    const handlers = this.events[eventName] || [];
-    handlers.push(callback);
-
-    this.events[eventName] = handlers;
-  }
-
-  trigger(eventName: string): void {
-    const handlers = this.events[eventName];
-
-    if (!handlers) {
-      return;
-    }
-
-    handlers.forEach((callback) => callback());
-  }
-
-  fetch(): void {
-    const id = this.get("id");
-
-    httpRequest
-      .get(`user/${id}`)
-      .then((res: AxiosResponse) => this.set(res.data));
-  }
-
-  save(): void {
-    const id = this.get("id");
-
-    !id
-      ? httpRequest.post("user", this.data)
-      : httpRequest.put(`user/${id}`, this.data);
   }
 }
