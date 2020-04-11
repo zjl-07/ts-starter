@@ -117,7 +117,7 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"src/model/Event.ts":[function(require,module,exports) {
+})({"src/model/features/Event.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1942,7 +1942,7 @@ exports.AxiosPromise = axios_1.AxiosPromise;
 exports.default = axios_1.default.create({
   baseURL: "http://localhost:3000"
 });
-},{"axios":"node_modules/axios/index.js"}],"src/model/DataSource.ts":[function(require,module,exports) {
+},{"axios":"node_modules/axios/index.js"}],"src/model/features/DataSourceFromApi.ts":[function(require,module,exports) {
 "use strict";
 
 var __importDefault = this && this.__importDefault || function (mod) {
@@ -1955,12 +1955,12 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var url_1 = __importDefault(require("../config/url"));
+var url_1 = __importDefault(require("../../config/url"));
 
-var DataSource =
+var DataSourceFromApi =
 /** @class */
 function () {
-  function DataSource(url) {
+  function DataSourceFromApi(url) {
     var _this = this;
 
     this.url = url;
@@ -1974,11 +1974,11 @@ function () {
     };
   }
 
-  return DataSource;
+  return DataSourceFromApi;
 }();
 
-exports.default = DataSource;
-},{"../config/url":"src/config/url.ts"}],"src/model/Attribute.ts":[function(require,module,exports) {
+exports.default = DataSourceFromApi;
+},{"../../config/url":"src/config/url.ts"}],"src/model/features/Attribute.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2010,8 +2010,108 @@ function () {
 }();
 
 exports.default = Attribute;
+},{}],"src/model/shared/Model.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Model =
+/** @class */
+function () {
+  function Model(attribute, events, dataSourceFromApi) {
+    var _this = this;
+
+    this.attribute = attribute;
+    this.events = events;
+    this.dataSourceFromApi = dataSourceFromApi;
+
+    this.set = function (data) {
+      _this.attribute.set(data);
+
+      _this.trigger("change");
+    };
+
+    this.save = function () {
+      var data = _this.attribute.getAll();
+
+      _this.dataSourceFromApi.save(data).then(function (res) {
+        return _this.trigger("save");
+      }).catch(function (err) {
+        return alert(err);
+      });
+    };
+  }
+
+  Object.defineProperty(Model.prototype, "on", {
+    get: function get() {
+      return this.events.on;
+    },
+    enumerable: true,
+    configurable: true
+  });
+  Object.defineProperty(Model.prototype, "trigger", {
+    get: function get() {
+      return this.events.trigger;
+    },
+    enumerable: true,
+    configurable: true
+  });
+  Object.defineProperty(Model.prototype, "get", {
+    get: function get() {
+      return this.attribute.get;
+    },
+    enumerable: true,
+    configurable: true
+  });
+
+  Model.prototype.fetch = function () {
+    var _this = this;
+
+    var id = this.attribute.get("id");
+
+    if (!id) {
+      throw new Error("Cannot Fetch Id of undefined");
+    }
+
+    this.dataSourceFromApi.fetch(id).then(function (res) {
+      _this.set(res.data);
+    });
+  };
+
+  return Model;
+}();
+
+exports.default = Model;
 },{}],"src/model/User.ts":[function(require,module,exports) {
 "use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
 
 var __importDefault = this && this.__importDefault || function (mod) {
   return mod && mod.__esModule ? mod : {
@@ -2023,81 +2123,32 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var Event_1 = __importDefault(require("./Event"));
+var Event_1 = __importDefault(require("./features/Event"));
 
-var DataSource_1 = __importDefault(require("./DataSource"));
+var DataSourceFromApi_1 = __importDefault(require("./features/DataSourceFromApi"));
 
-var Attribute_1 = __importDefault(require("./Attribute"));
+var Attribute_1 = __importDefault(require("./features/Attribute"));
+
+var Model_1 = __importDefault(require("./shared/Model"));
 
 var User =
 /** @class */
-function () {
-  function User(attr) {
-    var _this = this;
+function (_super) {
+  __extends(User, _super);
 
-    this.events = new Event_1.default();
-    this.dataSource = new DataSource_1.default("user");
-
-    this.set = function (data) {
-      _this.attribute.set(data);
-
-      _this.trigger("change");
-    };
-
-    this.save = function () {
-      var data = _this.attribute.getAll();
-
-      _this.dataSource.save(data).then(function (res) {
-        return _this.trigger("save");
-      }).catch(function (err) {
-        return alert(err);
-      });
-    };
-
-    this.attribute = new Attribute_1.default(attr);
+  function User() {
+    return _super !== null && _super.apply(this, arguments) || this;
   }
 
-  Object.defineProperty(User.prototype, "on", {
-    get: function get() {
-      return this.events.on;
-    },
-    enumerable: true,
-    configurable: true
-  });
-  Object.defineProperty(User.prototype, "trigger", {
-    get: function get() {
-      return this.events.trigger;
-    },
-    enumerable: true,
-    configurable: true
-  });
-  Object.defineProperty(User.prototype, "get", {
-    get: function get() {
-      return this.attribute.get;
-    },
-    enumerable: true,
-    configurable: true
-  });
-
-  User.prototype.fetch = function () {
-    var _this = this;
-
-    var id = this.attribute.get("id");
-
-    if (!id) {
-      throw new Error("Cannot Fetch Id of undefined");
-    }
-
-    this.dataSource.fetch(id).then(function (res) {
-      _this.set(res.data);
-    });
+  User.start = function (attr) {
+    return new User(new Attribute_1.default(attr), new Event_1.default(), new DataSourceFromApi_1.default("user"));
   };
 
   return User;
-}();
+}(Model_1.default);
 
 exports.default = User;
-},{"./Event":"src/model/Event.ts","./DataSource":"src/model/DataSource.ts","./Attribute":"src/model/Attribute.ts"}],"src/index.ts":[function(require,module,exports) {
+},{"./features/Event":"src/model/features/Event.ts","./features/DataSourceFromApi":"src/model/features/DataSourceFromApi.ts","./features/Attribute":"src/model/features/Attribute.ts","./shared/Model":"src/model/shared/Model.ts"}],"src/index.ts":[function(require,module,exports) {
 "use strict";
 
 var __importDefault = this && this.__importDefault || function (mod) {
@@ -2112,16 +2163,12 @@ Object.defineProperty(exports, "__esModule", {
 
 var User_1 = __importDefault(require("./model/User"));
 
-var user = new User_1.default({
-  id: 1
+var user = User_1.default.start({
+  name: "emilda",
+  age: 30
 });
-user.on("change", function () {
-  console.log("User Changed");
-});
-user.on("save", function () {
-  return alert("Successfully saving data");
-});
-user.fetch();
+user.get("age");
+console.log(user);
 },{"./model/User":"src/model/User.ts"}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -2150,7 +2197,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53959" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62103" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

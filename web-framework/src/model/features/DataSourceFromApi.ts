@@ -1,10 +1,10 @@
-import httpRequest, { AxiosPromise } from "../config/url";
+import httpRequest, { AxiosPromise } from "../../config/url";
 
 interface IhasId {
   id?: string;
 }
 
-export default class DataSource<T extends IhasId> {
+export default class DataSourceFromApi<T extends IhasId> {
   constructor(private url: string) {}
 
   fetch = (id: string): AxiosPromise => httpRequest.get(`${this.url}/${id}`);
