@@ -7,15 +7,10 @@ interface IhasId {
 export default class DataSource<T extends IhasId> {
   constructor(private url: string) {}
 
-  fetch(id: string): AxiosPromise {
-    return httpRequest.get(`${this.url}/${id}`);
-  }
+  fetch = (id: string): AxiosPromise => httpRequest.get(`${this.url}/${id}`);
 
-  save(data: T): AxiosPromise {
-    const id = data.id;
-
-    return !id
+  save = (data: T): AxiosPromise =>
+    !data.id
       ? httpRequest.post(this.url, data)
-      : httpRequest.put(`${this.url}/${id}`, data);
-  }
+      : httpRequest.put(`${this.url}/${data.id}`, data);
 }

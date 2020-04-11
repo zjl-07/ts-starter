@@ -1,11 +1,11 @@
 export default class Attribute<T> {
   constructor(private data: T) {}
 
-  get<K extends keyof T>(key: K): T[K] {
-    return this.data[key];
-  }
+  get = <K extends keyof T>(key: K): T[K] => this.data[key];
 
-  set(newData: T): void {
+  getAll = (): T => this.data;
+
+  set = (newData: T): void => {
     Object.assign(this.data, newData);
-  }
+  };
 }

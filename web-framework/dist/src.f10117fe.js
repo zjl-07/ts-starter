@@ -128,26 +128,28 @@ var Event =
 /** @class */
 function () {
   function Event() {
+    var _this = this;
+
     this.events = {};
+
+    this.on = function (eventName, callback) {
+      var handlers = _this.events[eventName] || [];
+      handlers.push(callback);
+      _this.events[eventName] = handlers;
+    };
+
+    this.trigger = function (eventName) {
+      var handlers = _this.events[eventName];
+
+      if (!handlers) {
+        return;
+      }
+
+      handlers.forEach(function (callback) {
+        return callback();
+      });
+    };
   }
-
-  Event.prototype.on = function (eventName, callback) {
-    var handlers = this.events[eventName] || [];
-    handlers.push(callback);
-    this.events[eventName] = handlers;
-  };
-
-  Event.prototype.trigger = function (eventName) {
-    var handlers = this.events[eventName];
-
-    if (!handlers) {
-      return;
-    }
-
-    handlers.forEach(function (callback) {
-      return callback();
-    });
-  };
 
   return Event;
 }();
@@ -1959,23 +1961,56 @@ var DataSource =
 /** @class */
 function () {
   function DataSource(url) {
+    var _this = this;
+
     this.url = url;
+
+    this.fetch = function (id) {
+      return url_1.default.get(_this.url + "/" + id);
+    };
+
+    this.save = function (data) {
+      return !data.id ? url_1.default.post(_this.url, data) : url_1.default.put(_this.url + "/" + data.id, data);
+    };
   }
-
-  DataSource.prototype.fetch = function (id) {
-    return url_1.default.get(this.url + "/" + id);
-  };
-
-  DataSource.prototype.save = function (data) {
-    var id = data.id;
-    return !id ? url_1.default.post(this.url, data) : url_1.default.put(this.url + "/" + id, data);
-  };
 
   return DataSource;
 }();
 
 exports.default = DataSource;
-},{"../config/url":"src/config/url.ts"}],"src/model/User.ts":[function(require,module,exports) {
+},{"../config/url":"src/config/url.ts"}],"src/model/Attribute.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Attribute =
+/** @class */
+function () {
+  function Attribute(data) {
+    var _this = this;
+
+    this.data = data;
+
+    this.get = function (key) {
+      return _this.data[key];
+    };
+
+    this.getAll = function () {
+      return _this.data;
+    };
+
+    this.set = function (newData) {
+      Object.assign(_this.data, newData);
+    };
+  }
+
+  return Attribute;
+}();
+
+exports.default = Attribute;
+},{}],"src/model/User.ts":[function(require,module,exports) {
 "use strict";
 
 var __importDefault = this && this.__importDefault || function (mod) {
@@ -1992,28 +2027,77 @@ var Event_1 = __importDefault(require("./Event"));
 
 var DataSource_1 = __importDefault(require("./DataSource"));
 
+var Attribute_1 = __importDefault(require("./Attribute"));
+
 var User =
 /** @class */
 function () {
-  function User(data) {
-    this.data = data;
+  function User(attr) {
+    var _this = this;
+
     this.events = new Event_1.default();
     this.dataSource = new DataSource_1.default("user");
+
+    this.set = function (data) {
+      _this.attribute.set(data);
+
+      _this.trigger("change");
+    };
+
+    this.save = function () {
+      var data = _this.attribute.getAll();
+
+      _this.dataSource.save(data).then(function (res) {
+        return _this.trigger("save");
+      }).catch(function (err) {
+        return alert(err);
+      });
+    };
+
+    this.attribute = new Attribute_1.default(attr);
   }
 
-  User.prototype.get = function (propName) {
-    return this.data[propName];
-  };
+  Object.defineProperty(User.prototype, "on", {
+    get: function get() {
+      return this.events.on;
+    },
+    enumerable: true,
+    configurable: true
+  });
+  Object.defineProperty(User.prototype, "trigger", {
+    get: function get() {
+      return this.events.trigger;
+    },
+    enumerable: true,
+    configurable: true
+  });
+  Object.defineProperty(User.prototype, "get", {
+    get: function get() {
+      return this.attribute.get;
+    },
+    enumerable: true,
+    configurable: true
+  });
 
-  User.prototype.set = function (newData) {
-    Object.assign(this.data, newData);
+  User.prototype.fetch = function () {
+    var _this = this;
+
+    var id = this.attribute.get("id");
+
+    if (!id) {
+      throw new Error("Cannot Fetch Id of undefined");
+    }
+
+    this.dataSource.fetch(id).then(function (res) {
+      _this.set(res.data);
+    });
   };
 
   return User;
 }();
 
 exports.default = User;
-},{"./Event":"src/model/Event.ts","./DataSource":"src/model/DataSource.ts"}],"src/index.ts":[function(require,module,exports) {
+},{"./Event":"src/model/Event.ts","./DataSource":"src/model/DataSource.ts","./Attribute":"src/model/Attribute.ts"}],"src/index.ts":[function(require,module,exports) {
 "use strict";
 
 var __importDefault = this && this.__importDefault || function (mod) {
@@ -2029,9 +2113,15 @@ Object.defineProperty(exports, "__esModule", {
 var User_1 = __importDefault(require("./model/User"));
 
 var user = new User_1.default({
-  id: "1"
+  id: 1
 });
-console.log("aa", user);
+user.on("change", function () {
+  console.log("User Changed");
+});
+user.on("save", function () {
+  return alert("Successfully saving data");
+});
+user.fetch();
 },{"./model/User":"src/model/User.ts"}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -2060,7 +2150,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61539" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53959" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
