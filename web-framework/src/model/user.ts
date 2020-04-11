@@ -1,5 +1,6 @@
 import Event from "./Event";
 import DataSource from "./DataSource";
+import Attribute from "./Attribute";
 
 type userProps = {
   id?: string;
@@ -10,14 +11,9 @@ type userProps = {
 export default class User {
   public events: Event = new Event();
   public dataSource: DataSource<userProps> = new DataSource<userProps>("user");
+  public attribute: Attribute<userProps>;
 
-  constructor(private data: userProps) {}
-
-  get(propName: string): number | string {
-    return this.data[propName];
-  }
-
-  set(newData: userProps): void {
-    Object.assign(this.data, newData);
+  constructor(attr: userProps) {
+    this.attribute = new Attribute<userProps>(attr);
   }
 }
