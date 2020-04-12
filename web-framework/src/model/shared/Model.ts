@@ -16,8 +16,8 @@ interface DataSourceFromApi<T> {
   save(data: T): AxiosPromise;
 }
 
-interface HasId{
-    id?: string
+interface HasId {
+  id?: string;
 }
 
 export default class Model<T extends HasId> {
@@ -27,24 +27,16 @@ export default class Model<T extends HasId> {
     private dataSourceFromApi: DataSourceFromApi<T>
   ) {}
 
-  get on() {
-    return this.events.on;
-  }
+  on = this.events.on;
+  trigger = this.events.trigger;
+  get = this.attribute.get;
 
-  get trigger() {
-    return this.events.trigger;
-  }
-
-  get get() {
-    return this.attribute.get;
-  }
-
-  set = (data: ) => {
+  set = (data: T) => {
     this.attribute.set(data);
     this.trigger("change");
   };
 
-  fetch() {
+  fetch = (): void => {
     const id = this.attribute.get("id");
 
     if (!id) {
@@ -54,9 +46,9 @@ export default class Model<T extends HasId> {
     this.dataSourceFromApi.fetch(id).then((res: AxiosResponse): void => {
       this.set(res.data);
     });
-  }
+  };
 
-  save = () => {
+  save = (): void => {
     const data = this.attribute.getAll();
 
     this.dataSourceFromApi

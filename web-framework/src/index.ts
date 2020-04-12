@@ -1,6 +1,6 @@
-import User from "./model/User";
+import User, { userProps } from "./model/User";
+import Collection from "./model/shared/Collection";
 
-const user = User.start({ name: "emilda", age: 30 });
-
-user.get("age");
-console.log(user);
+const user = User.build({ id: "aeef" });
+const allUser = User.buildUserCollection();
+allUser.fetch();

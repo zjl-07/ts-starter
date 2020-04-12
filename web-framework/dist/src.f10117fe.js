@@ -2026,11 +2026,26 @@ function () {
     this.attribute = attribute;
     this.events = events;
     this.dataSourceFromApi = dataSourceFromApi;
+    this.on = this.events.on;
+    this.trigger = this.events.trigger;
+    this.get = this.attribute.get;
 
     this.set = function (data) {
       _this.attribute.set(data);
 
       _this.trigger("change");
+    };
+
+    this.fetch = function () {
+      var id = _this.attribute.get("id");
+
+      if (!id) {
+        throw new Error("Cannot Fetch Id of undefined");
+      }
+
+      _this.dataSourceFromApi.fetch(id).then(function (res) {
+        _this.set(res.data);
+      });
     };
 
     this.save = function () {
@@ -2044,47 +2059,69 @@ function () {
     };
   }
 
-  Object.defineProperty(Model.prototype, "on", {
+  return Model;
+}();
+
+exports.default = Model;
+},{}],"src/model/shared/Collection.ts":[function(require,module,exports) {
+"use strict";
+
+var __importDefault = this && this.__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Event_1 = __importDefault(require("../features/Event"));
+
+var url_1 = __importDefault(require("../../config/url"));
+
+var Collection =
+/** @class */
+function () {
+  function Collection(urlPath, deserialize) {
+    this.urlPath = urlPath;
+    this.deserialize = deserialize;
+    this.collection = [];
+    this.events = new Event_1.default();
+  }
+
+  Object.defineProperty(Collection.prototype, "on", {
     get: function get() {
       return this.events.on;
     },
     enumerable: true,
     configurable: true
   });
-  Object.defineProperty(Model.prototype, "trigger", {
+  Object.defineProperty(Collection.prototype, "trigger", {
     get: function get() {
       return this.events.trigger;
     },
     enumerable: true,
     configurable: true
   });
-  Object.defineProperty(Model.prototype, "get", {
-    get: function get() {
-      return this.attribute.get;
-    },
-    enumerable: true,
-    configurable: true
-  });
 
-  Model.prototype.fetch = function () {
+  Collection.prototype.fetch = function () {
     var _this = this;
 
-    var id = this.attribute.get("id");
+    url_1.default.get(this.urlPath).then(function (res) {
+      res.data.forEach(function (el) {
+        return _this.collection.push(_this.deserialize(el));
+      });
 
-    if (!id) {
-      throw new Error("Cannot Fetch Id of undefined");
-    }
-
-    this.dataSourceFromApi.fetch(id).then(function (res) {
-      _this.set(res.data);
+      _this.trigger("change");
     });
   };
 
-  return Model;
+  return Collection;
 }();
 
-exports.default = Model;
-},{}],"src/model/User.ts":[function(require,module,exports) {
+exports.default = Collection;
+},{"../features/Event":"src/model/features/Event.ts","../../config/url":"src/config/url.ts"}],"src/model/User.ts":[function(require,module,exports) {
 "use strict";
 
 var __extends = this && this.__extends || function () {
@@ -2131,6 +2168,10 @@ var Attribute_1 = __importDefault(require("./features/Attribute"));
 
 var Model_1 = __importDefault(require("./shared/Model"));
 
+var Collection_1 = __importDefault(require("./shared/Collection"));
+
+var rootUrl = "user";
+
 var User =
 /** @class */
 function (_super) {
@@ -2140,15 +2181,21 @@ function (_super) {
     return _super !== null && _super.apply(this, arguments) || this;
   }
 
-  User.start = function (attr) {
-    return new User(new Attribute_1.default(attr), new Event_1.default(), new DataSourceFromApi_1.default("user"));
+  User.build = function (attr) {
+    return new User(new Attribute_1.default(attr), new Event_1.default(), new DataSourceFromApi_1.default(rootUrl));
+  };
+
+  User.buildUserCollection = function () {
+    return new Collection_1.default(rootUrl, function (json) {
+      return User.build(json);
+    });
   };
 
   return User;
 }(Model_1.default);
 
 exports.default = User;
-},{"./features/Event":"src/model/features/Event.ts","./features/DataSourceFromApi":"src/model/features/DataSourceFromApi.ts","./features/Attribute":"src/model/features/Attribute.ts","./shared/Model":"src/model/shared/Model.ts"}],"src/index.ts":[function(require,module,exports) {
+},{"./features/Event":"src/model/features/Event.ts","./features/DataSourceFromApi":"src/model/features/DataSourceFromApi.ts","./features/Attribute":"src/model/features/Attribute.ts","./shared/Model":"src/model/shared/Model.ts","./shared/Collection":"src/model/shared/Collection.ts"}],"src/index.ts":[function(require,module,exports) {
 "use strict";
 
 var __importDefault = this && this.__importDefault || function (mod) {
@@ -2163,12 +2210,11 @@ Object.defineProperty(exports, "__esModule", {
 
 var User_1 = __importDefault(require("./model/User"));
 
-var user = User_1.default.start({
-  name: "emilda",
-  age: 30
+var user = User_1.default.build({
+  id: "aeef"
 });
-user.get("age");
-console.log(user);
+var allUser = User_1.default.buildUserCollection();
+allUser.fetch();
 },{"./model/User":"src/model/User.ts"}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -2197,7 +2243,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62103" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51638" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
