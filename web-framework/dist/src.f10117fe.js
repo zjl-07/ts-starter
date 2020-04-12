@@ -135,12 +135,25 @@ function () {
 
     this.eventMap = function () {
       return {
-        "click:.setAgeButton": _this.onSetAgeButtonClick
+        "click:.setAgeButton": _this.onSetAgeButtonClick,
+        "click:.updateNameButton": _this.onUpdateNameButtonClick
       };
     };
 
     this.onSetAgeButtonClick = function () {
       return _this.data.setRandomAge();
+    };
+
+    this.onUpdateNameButtonClick = function () {
+      var input = _this.parent.querySelector('input');
+
+      if (input) {
+        var name = input.value;
+
+        _this.data.set({
+          name: name
+        });
+      }
     };
 
     this.bindEvent = function (fragment) {
@@ -162,7 +175,7 @@ function () {
     };
 
     this.template = function () {
-      return "\n    <div>\n        <H1>Edit Form</H1>\n        <pre>User name : " + _this.data.get("name") + "</pre>\n        <pre>User age  : " + _this.data.get("age") + "</pre>\n        <input/>\n        <button class=\"setAgeButton\">SET RANDOM AGE</button>\n    </div>\n  ";
+      return "\n    <div>\n        <H1>Edit Form</H1>\n        <pre>User name : " + _this.data.get("name") + "</pre>\n        <pre>User age  : " + _this.data.get("age") + "</pre>\n        <input/>\n        <button class=\"setAgeButton\">SET RANDOM AGE</button>\n        <button class=\"updateNameButton\">UPDATE NAME</button>\n    </div>\n  ";
     };
 
     this.render = function () {
@@ -2293,8 +2306,14 @@ var user = User_1.default.build({
   name: "emilda zhang haha",
   age: 21
 });
-var userForm = new UserForm_1.default(document.getElementById("root"), user);
-userForm.render();
+var root = document.getElementById("root");
+
+if (root) {
+  var userForm = new UserForm_1.default(root, user);
+  userForm.render();
+} else {
+  alert("root element not found in document");
+}
 },{"./view/UserForm":"src/view/UserForm.ts","./model/User":"src/model/User.ts"}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -2323,7 +2342,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56824" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61227" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
