@@ -117,7 +117,74 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"src/model/features/Event.ts":[function(require,module,exports) {
+})({"src/view/UserForm.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var UserForm =
+/** @class */
+function () {
+  function UserForm(parent, data) {
+    var _this = this;
+
+    this.parent = parent;
+    this.data = data;
+
+    this.eventMap = function () {
+      return {
+        "click:.setAgeButton": _this.onSetAgeButtonClick
+      };
+    };
+
+    this.onSetAgeButtonClick = function () {
+      return _this.data.setRandomAge();
+    };
+
+    this.bindEvent = function (fragment) {
+      var eventMap = _this.eventMap();
+
+      var _loop_1 = function _loop_1(eventKey) {
+        var _a = eventKey.split(":"),
+            eventName = _a[0],
+            elementSelector = _a[1];
+
+        fragment.querySelectorAll(elementSelector).forEach(function (el) {
+          el.addEventListener(eventName, eventMap[eventKey]);
+        });
+      };
+
+      for (var eventKey in eventMap) {
+        _loop_1(eventKey);
+      }
+    };
+
+    this.template = function () {
+      return "\n    <div>\n        <H1>Edit Form</H1>\n        <pre>User name : " + _this.data.get("name") + "</pre>\n        <pre>User age  : " + _this.data.get("age") + "</pre>\n        <input/>\n        <button class=\"setAgeButton\">SET RANDOM AGE</button>\n    </div>\n  ";
+    };
+
+    this.render = function () {
+      _this.parent.innerHTML = "";
+      var templateElement = document.createElement("template");
+      templateElement.innerHTML = _this.template();
+
+      _this.bindEvent(templateElement.content);
+
+      _this.parent.append(templateElement.content);
+    };
+
+    this.data.on("change", function () {
+      _this.render();
+    });
+  }
+
+  return UserForm;
+}();
+
+exports.default = UserForm;
+},{}],"src/model/features/Event.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2178,7 +2245,17 @@ function (_super) {
   __extends(User, _super);
 
   function User() {
-    return _super !== null && _super.apply(this, arguments) || this;
+    var _this = _super !== null && _super.apply(this, arguments) || this;
+
+    _this.setRandomAge = function () {
+      var age = Math.round(Math.random() * 100);
+
+      _this.set({
+        age: age
+      });
+    };
+
+    return _this;
   }
 
   User.build = function (attr) {
@@ -2208,14 +2285,17 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var UserForm_1 = __importDefault(require("./view/UserForm"));
+
 var User_1 = __importDefault(require("./model/User"));
 
 var user = User_1.default.build({
-  id: "aeef"
+  name: "emilda zhang haha",
+  age: 21
 });
-var allUser = User_1.default.buildUserCollection();
-allUser.fetch();
-},{"./model/User":"src/model/User.ts"}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+var userForm = new UserForm_1.default(document.getElementById("root"), user);
+userForm.render();
+},{"./view/UserForm":"src/view/UserForm.ts","./model/User":"src/model/User.ts"}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -2243,7 +2323,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51638" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56824" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

@@ -1,6 +1,7 @@
-import User, { userProps } from "./model/User";
-import Collection from "./model/shared/Collection";
+import UserForm from "./view/UserForm";
+import User from "./model/User";
 
-const user = User.build({ id: "aeef" });
-const allUser = User.buildUserCollection();
-allUser.fetch();
+const user = User.build({ name: "emilda zhang haha", age: 21 });
+
+const userForm = new UserForm(document.getElementById("root"), user);
+userForm.render();
