@@ -43,9 +43,11 @@ export default class Model<T extends HasId> {
       throw new Error("Cannot Fetch Id of undefined");
     }
 
-    this.dataSourceFromApi.fetch(id).then((res: AxiosResponse): void => {
-      this.set(res.data);
-    });
+    this.dataSourceFromApi
+      .fetch(id as string)
+      .then((res: AxiosResponse): void => {
+        this.set(res.data);
+      });
   };
 
   save = (): void => {
