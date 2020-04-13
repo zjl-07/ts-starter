@@ -117,44 +117,21 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"src/view/UserForm.ts":[function(require,module,exports) {
+})({"src/view/View.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var UserForm =
+var View =
 /** @class */
 function () {
-  function UserForm(parent, data) {
+  function View(parent, data) {
     var _this = this;
 
     this.parent = parent;
     this.data = data;
-
-    this.eventMap = function () {
-      return {
-        "click:.setAgeButton": _this.onSetAgeButtonClick,
-        "click:.updateNameButton": _this.onUpdateNameButtonClick
-      };
-    };
-
-    this.onSetAgeButtonClick = function () {
-      return _this.data.setRandomAge();
-    };
-
-    this.onUpdateNameButtonClick = function () {
-      var input = _this.parent.querySelector('input');
-
-      if (input) {
-        var name = input.value;
-
-        _this.data.set({
-          name: name
-        });
-      }
-    };
 
     this.bindEvent = function (fragment) {
       var eventMap = _this.eventMap();
@@ -174,10 +151,6 @@ function () {
       }
     };
 
-    this.template = function () {
-      return "\n    <div>\n        <H1>Edit Form</H1>\n        <pre>User name : " + _this.data.get("name") + "</pre>\n        <pre>User age  : " + _this.data.get("age") + "</pre>\n        <input/>\n        <button class=\"setAgeButton\">SET RANDOM AGE</button>\n        <button class=\"updateNameButton\">UPDATE NAME</button>\n    </div>\n  ";
-    };
-
     this.render = function () {
       _this.parent.innerHTML = "";
       var templateElement = document.createElement("template");
@@ -193,11 +166,94 @@ function () {
     });
   }
 
-  return UserForm;
+  return View;
 }();
 
+exports.default = View;
+},{}],"src/view/UserForm.ts":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+var __importDefault = this && this.__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var View_1 = __importDefault(require("./View"));
+
+var UserForm =
+/** @class */
+function (_super) {
+  __extends(UserForm, _super);
+
+  function UserForm() {
+    var _this = _super !== null && _super.apply(this, arguments) || this;
+
+    _this.eventMap = function () {
+      return {
+        "click:.setAgeButton": _this.onSetAgeButtonClick,
+        "click:.updateNameButton": _this.onUpdateNameButtonClick
+      };
+    };
+
+    _this.onSetAgeButtonClick = function () {
+      return _this.data.setRandomAge();
+    };
+
+    _this.onUpdateNameButtonClick = function () {
+      var input = _this.parent.querySelector("input");
+
+      if (input) {
+        var name = input.value;
+
+        _this.data.set({
+          name: name
+        });
+      }
+    };
+
+    _this.template = function () {
+      return "\n    <div>\n        <H1>Edit Form</H1>\n        <pre>User name : " + _this.data.get("name") + "</pre>\n        <pre>User age  : " + _this.data.get("age") + "</pre>\n        <input/>\n        <button class=\"setAgeButton\">SET RANDOM AGE</button>\n        <button class=\"updateNameButton\">UPDATE NAME</button>\n    </div>\n  ";
+    };
+
+    return _this;
+  }
+
+  return UserForm;
+}(View_1.default);
+
 exports.default = UserForm;
-},{}],"src/model/features/Event.ts":[function(require,module,exports) {
+},{"./View":"src/view/View.ts"}],"src/model/features/Event.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2342,7 +2398,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61227" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62825" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

@@ -1,36 +1,19 @@
-import User from "../model/User";
+import User, { userProps } from "../model/User";
+import View from "./View";
 
-export default class UserForm {
-  constructor(public parent: Element, public data: User) {
-    this.data.on("change", () =>{
-        this.render()
-    };
-  }
-
+export default class UserForm extends View<User, userProps> {
   eventMap = (): { [key: string]: () => void } => ({
     "click:.setAgeButton": this.onSetAgeButtonClick,
     "click:.updateNameButton": this.onUpdateNameButtonClick,
   });
 
   onSetAgeButtonClick = (): void => this.data.setRandomAge();
-  onUpdateNameButtonClick = () : void =>{
-      const input = this.parent.querySelector('input')
-     
-      if(input){
-          const name = input.value
-          this.data.set({name})
-      }
-  };
+  onUpdateNameButtonClick = (): void => {
+    const input = this.parent.querySelector("input");
 
-  bindEvent = (fragment: DocumentFragment) => {
-    const eventMap = this.eventMap();
-
-    for (let eventKey in eventMap) {
-      const [eventName, elementSelector] = eventKey.split(":");
-
-      fragment.querySelectorAll(elementSelector).forEach((el) => {
-        el.addEventListener(eventName, eventMap[eventKey]);
-      });
+    if (input) {
+      const name = input.value;
+      this.data.set({ name });
     }
   };
 
@@ -44,15 +27,4 @@ export default class UserForm {
         <button class="updateNameButton">UPDATE NAME</button>
     </div>
   `;
-
-  render = (): void => {
-    this.parent.innerHTML = ""
-
-    const templateElement = document.createElement("template");
-    templateElement.innerHTML = this.template();
-
-    this.bindEvent(templateElement.content);
-
-    this.parent.append(templateElement.content);
-  };
 }
