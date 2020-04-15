@@ -59,3 +59,30 @@ yarn-error.log*
 /web-framework/yarn-debug.log*
 /web-framework/yarn-error.log*
 
+
+
+# dependencies
+/node_modules
+/typescript-with-express/node_modules
+/typescript-with-express/.pnp
+/typescript-with-express/.pnp.js
+
+# testing
+/typescript-with-express/coverage
+
+# production
+/typescript-with-express/build
+
+# misc
+/typescript-with-express/.DS_Store
+/typescript-with-express/.env.local
+/typescript-with-express/.env.development.local
+/typescript-with-express/.env.test.local
+/typescript-with-express/.env.production.local
+
+
+
+/typescript-with-express/npm-debug.log*
+/typescript-with-express/yarn-debug.log*
+/typescript-with-express/yarn-error.log*
+
